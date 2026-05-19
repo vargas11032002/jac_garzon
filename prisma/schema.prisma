@@ -1,0 +1,125 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Afiliado {
+  id             String    @id @default(cuid())
+  cedula         String    @unique
+  codigoJAC      String    @unique
+  nombre         String
+  apellido       String
+  telefono       String?
+  email          String?
+  direccion      String?
+  barrio         String?
+  cargo          String    @default("Comunero")
+  foto           String?
+  activo         Boolean   @default(true)
+  fechaIngreso   DateTime  @default(now())
+  vigenciaHasta  DateTime?
+  password       String
+  cuotas         Cuota[]
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+}
+
+model ConfiguracionJAC {
+  id             String   @id @default(cuid())
+  nombreJAC      String   @default("Junta de Acción Comunal")
+  municipio      String   @default("Garzón")
+  departamento   String   @default("Huila")
+  logo           String?
+  valorCuotaMes  Float    @default(0)
+  presidente     String?
+  nit            String?
+  resolucion     String?
+  updatedAt      DateTime @updatedAt
+}
+
+model Cuota {
+  id          String    @id @default(cuid())
+  afiliado    Afiliado  @relation(fields: [afiliadoId], references: [id])
+  afiliadoId  String
+  mes         Int
+  anio        Int
+  valor       Float
+  pagado      Boolean   @default(false)
+  fechaPago   DateTime?
+  comprobante String?
+  createdAt   DateTime  @default(now())
+}
+
+model Acta {
+  id         String   @id @default(cuid())
+  numero     Int
+  fecha      DateTime
+  tipo       String
+  lugar      String
+  asistentes Int
+  orden      String
+  contenido  String
+  aprobada   Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model Proyecto {
+  id          String    @id @default(cuid())
+  nombre      String
+  descripcion String?
+  estado      String    @default("PLANEACION")
+  presupuesto Float?
+  ejecutado   Float     @default(0)
+  inicio      DateTime?
+  fin         DateTime?
+  responsable String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model Transaccion {
+  id          String   @id @default(cuid())
+  tipo        String
+  concepto    String
+  valor       Float
+  fecha       DateTime @default(now())
+  categoria   String?
+  comprobante String?
+  notas       String?
+  createdAt   DateTime @default(now())
+}
+
+model Comunicado {
+  id          String    @id @default(cuid())
+  titulo      String
+  contenido   String
+  tipo        String    @default("GENERAL")
+  publicado   Boolean   @default(false)
+  fechaPublic DateTime?
+  createdAt   DateTime  @default(now())
+}
+
+model Evento {
+  id          String   @id @default(cuid())
+  titulo      String
+  descripcion String?
+  fecha       DateTime
+  horaInicio  String?
+  horaFin     String?
+  lugar       String?
+  tipo        String   @default("REUNION")
+  createdAt   DateTime @default(now())
+}
+
+model AdminUser {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  nombre    String
+  rol       String   @default("ADMIN")
+  createdAt DateTime @default(now())
+}
