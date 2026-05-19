@@ -1,18 +1,14 @@
-import { PrismaPg } from "@prisma/adapter-pg";
-import { Pool } from "pg";
+import { PrismaClient } from "@prisma/client";
 
-const globalForPrisma = globalThis as any;
+const globalForPrisma = globalThis as unknown as {
+  prisma: PrismaClient | undefined;
+};
 
-function createPrisma() {
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const { PrismaClient } = require("../../node_modules/.prisma/client/default.js");
-  const pool = new Pool({
-    connectionString: "postgresql://postgres:2112@localhost:5432/jac_garzon",
-  });
-  const adapter = new PrismaPg(pool);
-  return new PrismaClient({ adapter });
+export const prisma =
+  globalForPrisma.prisma ?? new PrismaClient();
+
+if (process.env.NODE_ENV !== "production") {
+  globalForPrisma.prisma = prisma;
 }
 
-export const prisma = globalForPrisma.prisma ?? createPrisma();
-
-if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
+export default prisma;
